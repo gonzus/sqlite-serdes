@@ -202,6 +202,7 @@ static int check_sqlite(void) {
 
     printf("SQLite library version: %d [%s]\n", sqlite3_libversion_number(), sqlite3_libversion());
     printf("SQLite source id: [%s]\n", sqlite3_sourceid());
+    printf("SQLite threadsafe: %s\n", sqlite3_threadsafe() ? "YES" : "NO");
 
     int serdes = 1;
 #if 0
