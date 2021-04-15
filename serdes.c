@@ -189,5 +189,5 @@ static void query_db(int db) {
 
 static void show_db_info(int db) {
     const char* file = sqlite3_db_filename(data[db].handle, 0);
-    fprintf(stderr, "File for database %s is %p - [%s]\n", data[db].file, file, file ? file : "");
+    fprintf(stderr, "File for database %s is %p - [%s]\n", data[db].file, file, file ? file : ":NULL:");
 }
