@@ -19,7 +19,7 @@ static struct {
     { ":memory:", 0 },
 };
 
-static void check_sqlite(void);
+static int check_sqlite(void);
 static void query_db(int db);
 static void show_db_info(int db);
 
@@ -31,7 +31,10 @@ int main(int argc, char* argv[]) {
     int rc = SQLITE_OK;
 
     do {
-        check_sqlite();
+        if (!check_sqlite()) {
+            fprintf(stderr, "SQLite library does not support required features\n");
+            break;
+        }
 
         printf("==============================\n");
         int bail = 0;
@@ -192,13 +195,29 @@ static int query_tables_in_db(int db) {
     return row;
 }
 
-static void check_sqlite(void) {
+static int check_sqlite(void) {
     assert(sqlite3_libversion_number() == SQLITE_VERSION_NUMBER);
     assert(strcmp(sqlite3_libversion(), SQLITE_VERSION) == 0);
     assert(strcmp(sqlite3_sourceid(), SQLITE_SOURCE_ID) == 0);
 
     printf("SQLite library version: %d [%s]\n", sqlite3_libversion_number(), sqlite3_libversion());
     printf("SQLite source id: [%s]\n", sqlite3_sourceid());
+
+    int serdes = 1;
+#if 0
+    // Commented out because ENABLE_DESERIALIZE is one of the options that
+    // SQLite mistakenly (as of 3.35.4) does not store in its internal list of
+    // compile options.
+    for (int opt = 0; 1; ++opt) {
+        const char* name = sqlite3_compileoption_get(opt);
+        if (!name) break;
+        printf("SQLite option %d: [%s]\n", opt, name);
+    }
+
+    int serdes = sqlite3_compileoption_used("ENABLE_DESERIALIZE");
+    printf("SQLite support for seralization / deserealization: %s\n", serdes ? "YES" : "NO");
+#endif
+    return serdes;
 }
 
 static void query_db(int db) {
