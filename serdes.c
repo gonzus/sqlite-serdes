@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <sqlite3.h>
@@ -18,6 +19,7 @@ static struct {
     { ":memory:", 0 },
 };
 
+static void check_sqlite(void);
 static void query_db(int db);
 static void show_db_info(int db);
 
@@ -29,7 +31,7 @@ int main(int argc, char* argv[]) {
     int rc = SQLITE_OK;
 
     do {
-        printf("SQLite library version [%s]\n", sqlite3_libversion());
+        check_sqlite();
 
         printf("==============================\n");
         int bail = 0;
@@ -187,6 +189,15 @@ static int query_tables_in_db(int db) {
     }
 
     return row;
+}
+
+static void check_sqlite(void) {
+    assert(sqlite3_libversion_number() == SQLITE_VERSION_NUMBER);
+    assert(strcmp(sqlite3_libversion(), SQLITE_VERSION) == 0);
+    assert(strcmp(sqlite3_sourceid(), SQLITE_SOURCE_ID) == 0);
+
+    printf("SQLite library version: %d [%s]\n", sqlite3_libversion_number(), sqlite3_libversion());
+    printf("SQLite source id: [%s]\n", sqlite3_sourceid());
 }
 
 static void query_db(int db) {
