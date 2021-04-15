@@ -36,7 +36,8 @@ int main(int argc, char* argv[]) {
         printf("==============================\n");
         int bail = 0;
         for (int db = 0; db < DB_LAST; ++db) {
-            rc = sqlite3_open(data[db].file, &data[db].handle);
+            int flags = SQLITE_OPEN_READONLY;
+            rc = sqlite3_open_v2(data[db].file, &data[db].handle, flags, 0);
             if (rc != SQLITE_OK) {
                 fprintf(stderr, "Cannot open database %s - %s\n", data[db].file, sqlite3_errmsg(data[db].handle));
                 bail = 1;
@@ -103,7 +104,7 @@ int main(int argc, char* argv[]) {
     printf("==============================\n");
     for (int db = 0; db < DB_LAST; ++db) {
         if (!data[db].handle) continue;
-        sqlite3_close(data[db].handle);
+        sqlite3_close_v2(data[db].handle);
         fprintf(stderr, "Closed database %s\n", data[db].file);
         data[db].handle = 0;
     }
