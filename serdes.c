@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     do {
         printf("SQLite library version [%s]\n", sqlite3_libversion());
 
+        printf("==============================\n");
         int bail = 0;
         for (int db = 0; db < DB_LAST; ++db) {
             rc = sqlite3_open(data[db].file, &data[db].handle);
@@ -43,14 +44,17 @@ int main(int argc, char* argv[]) {
         }
         if (bail) break;
 
+        printf("==============================\n");
         for (int db = 0; db < DB_LAST; ++db) {
             show_db_info(db);
         }
 
         for (int db = 0; db < DB_LAST; ++db) {
+            printf("==============================\n");
             query_db(db);
         }
 
+        printf("==============================\n");
         unsigned int flags = 0;
         sqlite3_int64 len = 0;
         buf = sqlite3_serialize(data[EUROPE].handle, 0, &len, flags);
@@ -60,6 +64,7 @@ int main(int argc, char* argv[]) {
         }
         fprintf(stderr, "Serialized %s - %lld bytes @ %p\n", data[EUROPE].file, len, buf);
 
+        printf("==============================\n");
         rc = sqlite3_deserialize(data[AFRICA].handle, 0, buf, len, len, flags);
         if (rc != SQLITE_OK) {
             fprintf(stderr, "Cannot deserialize from %s into %s\n", data[EUROPE].file, data[AFRICA].file);
@@ -67,6 +72,7 @@ int main(int argc, char* argv[]) {
         }
         fprintf(stderr, "Deserialized from %s into %s\n", data[EUROPE].file, data[AFRICA].file);
 
+        printf("==============================\n");
         rc = sqlite3_deserialize(data[MEMORY].handle, 0, buf, len, len, flags);
         if (rc != SQLITE_OK) {
             fprintf(stderr, "Cannot deserialize from %s into %s\n", data[EUROPE].file, data[MEMORY].file);
@@ -74,21 +80,25 @@ int main(int argc, char* argv[]) {
         }
         fprintf(stderr, "Deserialized from %s into %s\n", data[EUROPE].file, data[MEMORY].file);
 
+        printf("==============================\n");
         for (int db = 0; db < DB_LAST; ++db) {
             show_db_info(db);
         }
 
         for (int db = 0; db < DB_LAST; ++db) {
+            printf("==============================\n");
             query_db(db);
         }
     } while (0);
 
+    printf("==============================\n");
     if (buf) {
         sqlite3_free(buf);
         fprintf(stderr, "Released serialization buffer for database %s\n", data[EUROPE].file);
         buf = 0;
     }
 
+    printf("==============================\n");
     for (int db = 0; db < DB_LAST; ++db) {
         if (!data[db].handle) continue;
         sqlite3_close(data[db].handle);
